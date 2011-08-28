@@ -24,15 +24,13 @@
 		</array>
 	</dict>
 	<key>PlexClientPlatforms</key>
-	<string>MacOSX,LGTV</string>
+	<string>MacOSX</string>
 	<key>PlexFrameworkVersion</key>
 	<string>1</string>
 	<key>PlexMediaContainer</key>
 	<array>
 		<string>Silverlight</string>
 	</array>
-	<key>PlexPluginDebug</key>
-	<string>1</string>
 	<key>PlexPluginMode</key>
 	<string>AlwaysOn</string>
 </dict>
