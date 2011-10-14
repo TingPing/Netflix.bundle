@@ -33,5 +33,9 @@
 	</array>
 	<key>PlexPluginMode</key>
 	<string>AlwaysOn</string>
+	<key>PlexPluginRegions</key>
+	<array>
+		<string>US</string>
+	</array>
 </dict>
 </plist>
