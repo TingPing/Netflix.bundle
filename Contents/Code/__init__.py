@@ -36,7 +36,44 @@ __ratingCache         = {}
 __quickCache          = {}
 __inInstantQ          = {}
 
+def __getRegistrySubkeys(key, subkey):
+    try:
+        import _winreg
+    except ImportError:
+        return None, []
+
+    handle = None
+    keys = []
+    try:
+        flags = _winreg.KEY_ENUMERATE_SUB_KEYS | _winreg.KEY_WOW64_32KEY
+        handle = _winreg.OpenKey(key, subkey, 0, flags)
+        i = 0
+        while True:
+            keys.append(_winreg.EnumKey(handle, i))
+            i += 1
+    except WindowsError:
+        pass
+    return handle, keys
+
+def __hasSilverlightWin():
+    try:
+        import _winreg
+    except ImportError:
+        return False
+
+    hives = (_winreg.HKEY_LOCAL_MACHINE, _winreg.HKEY_CURRENT_USER)
+    for hive in hives:
+        handle, plugins = __getRegistrySubkeys(hive, r"Software\MozillaPlugins")
+        for plugin in plugins:
+            handle2, mimes = __getRegistrySubkeys(handle, r"%s\MimeTypes" % plugin)
+            if "application/x-silverlight" in mimes:
+                return True
+    return False
+
 def __hasSilverlight():
+    # TODO: Remove all this after moving to v2 of the framework. The
+    # HasSilverlight check has been updated in v2 to support Windows
+    # and check all of the OS X paths.
     retVal = Platform.HasSilverlight
     if retVal == False:
         PMS.Log("trying to find silverlight in other places")
@@ -50,6 +87,9 @@ def __hasSilverlight():
             if os.path.exists(p):
                 PMS.Log("found in %s" % p)
                 return True
+        if __hasSilverlightWin():
+            PMS.Log("found in registry")
+            return True
     else:
         PMS.Log("found silverlight with Platform.HasSilverlight")
     return retVal
