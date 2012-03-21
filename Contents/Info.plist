@@ -23,14 +23,16 @@
 			<string>webkit</string>
 		</array>
 	</dict>
+	<key>PlexClientPlatformExclusions</key>
+	<string>Roku</string>
+	<key>PlexClientPlatforms</key>
+	<string>*</string>
 	<key>PlexFrameworkVersion</key>
 	<string>1</string>
 	<key>PlexMediaContainer</key>
 	<array>
 		<string>Silverlight</string>
 	</array>
-	<key>PlexClientPlatforms</key>
-	<string>*</string>
 	<key>PlexPluginMode</key>
 	<string>AlwaysOn</string>
 	<key>PlexPluginRegions</key>
