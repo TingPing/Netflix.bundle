@@ -1,0 +1,21 @@
+[
+    {
+        "id": "username",
+        "type": "text",
+        "label": "Login Email",
+        "default": "" 
+    },
+    {
+        "id": "password",
+        "type": "text",
+        "label": "Password",
+        "default": "",
+        "option": "hidden" 
+    },
+    {
+        "id": "cookieallow",
+        "type": "bool",
+        "label": "Allow Netflix Cookie",
+        "default": "true"
+    }
+]

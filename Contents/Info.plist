@@ -28,7 +28,7 @@
 	<key>PlexClientPlatforms</key>
 	<string>*</string>
 	<key>PlexFrameworkVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>PlexMediaContainer</key>
 	<array>
 		<string>Silverlight</string>
@@ -39,5 +39,9 @@
 	<array>
 		<string>US</string>
 	</array>
+	<key>PlexPluginDevMode</key>
+	<string>1</string>
+	<key>PlexPluginCodePolicy</key>
+	<string>Elevated</string>
 </dict>
 </plist>
