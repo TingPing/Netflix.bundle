@@ -28,7 +28,7 @@ def Menu():
 
   # Verify that Silverlight is currently installed.
   if Platform.HasSilverlight == False:
-    return MessageContainer('Error', 'Silverlight is required for the Netflix plug-in. Please visit http://silverlight.net to install.')
+    return MessageContainer('Error', 'Silverlight is required for the Netflix plug-in. On your Plex Media Server please visit http://silverlight.net to install.')
 
   return Main().MainMenu()
 
