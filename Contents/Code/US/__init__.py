@@ -19,7 +19,7 @@ def MainMenu():
   if not logged_in:
     logged_in = US_Account.TryLogIn()
 
-  oc = ObjectContainer()
+  oc = ObjectContainer(no_cache = True)
 
   if logged_in:
 
@@ -57,7 +57,7 @@ def FreeTrial():
 ###################################################################################################
 
 @route('/video/netflix/us/menuitem')
-def MenuItem(url, title):
+def MenuItem(url, title, start_index = 0, max_results = 50):
   oc = ObjectContainer(title2 = title)
 
   # Separate out the specified parameters from the original URL
@@ -66,6 +66,10 @@ def MenuItem(url, title):
     original_params = String.ParseQueryString(url[url.find('?') + 1:])
     for key, value in original_params.items():
   	 params[key] = value[0]
+
+  # Add the paging parameters
+  params['start_index'] = str(start_index)
+  params['max_results'] = str(max_results)
 
   # Add the additional parameters to ensure that we get all of the required items expaned.
   params['expand'] = '@title,@box_art,@synopsis,@directors,@seasons,@episodes'
@@ -130,6 +134,14 @@ def MenuItem(url, title):
         duration = item_details['duration'],
         rating = item_details['rating'],
         content_rating = item_details['content_rating']))
+
+
+  # If there are further results, add an item to allow them to be browsed.
+  number_of_results = menu_item.xpath('//catalog/number_of_results/text()')[0]
+  if number_of_results < ((start_index * max_results) + max_results):
+    oc.add(DirectoryObject(
+      key = Callback(MenuItem, url = url, title = title, start_index = start_index + 1, max_results = max_results), 
+      title = "Next..."))
 
   return oc
 
