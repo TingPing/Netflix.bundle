@@ -137,10 +137,12 @@ def MenuItem(url, title, start_index = 0, max_results = 50):
 
 
   # If there are further results, add an item to allow them to be browsed.
-  number_of_results = menu_item.xpath('//catalog/number_of_results/text()')[0]
-  if number_of_results < ((start_index * max_results) + max_results):
+  start_index = int(start_index)
+  max_results = int(max_results)
+  number_of_results = int(menu_item.xpath('//catalog/number_of_results/text()')[0])
+  if number_of_results > (start_index + max_results):
     oc.add(DirectoryObject(
-      key = Callback(MenuItem, url = url, title = title, start_index = start_index + 1, max_results = max_results), 
+      key = Callback(MenuItem, url = url, title = title, start_index = start_index + max_results, max_results = max_results), 
       title = "Next..."))
 
   return oc
