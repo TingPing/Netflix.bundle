@@ -11,12 +11,7 @@ ICON_SEARCH     = 'icon-search.png'
 
 def Start():
 
-  # Set the types of view groups
-  Plugin.AddViewGroup('List', viewMode = 'List', mediaType = 'items')
-  Plugin.AddViewGroup('InfoList', viewMode = 'InfoList', mediaType = 'items')
-
   ObjectContainer.title1 = TITLE
-  ObjectContainer.view_group = 'List'
   ObjectContainer.art = R(ART)
 
   DirectoryObject.thumb = R(ICON_DEFAULT)

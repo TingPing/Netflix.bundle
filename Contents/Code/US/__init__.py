@@ -24,20 +24,9 @@ def MainMenu():
   oc = ObjectContainer(no_cache = True)
 
   if logged_in:
-
-    # If the user is currently logged in, then we have validated their credentials and will be able 
-    # to access their associated (personalized) content list.
-    user_id = US_Account.GetUserId()
-    user_list_url = US_Account.GetAPIURL('http://api.netflix.com/users/%s/lists' % user_id, params = { 'v': '2', 'client': 'plex' })
-    user_list = XML.ElementFromURL(user_list_url)
-
-    # Add the found items
-    for item in user_list.xpath('//lists/list/link'):
-      url = item.get('href')
-      title = item.get('title')
-      oc.add(DirectoryObject(key = Callback(MenuItem, url = url, title = title), title = title))
-
-    # Add a Search option
+    
+    oc.add(DirectoryObject(key = Callback(UserList), title = 'TV & Movies'))
+    oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue'), title = 'Instant Queue'))
     oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...'))
 
   else:
@@ -52,12 +41,22 @@ def MainMenu():
 
 ###################################################################################################
 
-@route('/video/netflix/us/freetrial')
-def FreeTrial():
-  url = "http://www.netflix.com/"
-  webbrowser.open(url, new=1, autoraise=True)
-  return MessageContainer("Free Trial Signup", """A browser has been opened so that you may sign up for a free trial.  If you do not have a mouse 
-      and keyboard handy, visit http://www.netflix.com and sign up for free today!""")
+@route('/video/netflix/us/userlist')
+def UserList():
+
+  oc = ObjectContainer()
+
+  user_id = US_Account.GetUserId()
+  user_list_url = US_Account.GetAPIURL('http://api.netflix.com/users/%s/lists' % user_id, params = { 'v': '2', 'client': 'plex' })
+  user_list = XML.ElementFromURL(user_list_url)
+
+  # Add the found items
+  for item in user_list.xpath('//lists/list/link'):
+    url = item.get('href')
+    title = item.get('title')
+    oc.add(DirectoryObject(key = Callback(MenuItem, url = url, title = title), title = title))
+
+  return oc
 
 ###################################################################################################
 
@@ -67,9 +66,18 @@ def Search(query):
 
 ###################################################################################################
 
+@route('/video/netflix/us/freetrial')
+def FreeTrial():
+  url = "http://www.netflix.com/"
+  webbrowser.open(url, new=1, autoraise=True)
+  return MessageContainer("Free Trial Signup", """A browser has been opened so that you may sign up for a free trial.  If you do not have a mouse 
+      and keyboard handy, visit http://www.netflix.com and sign up for free today!""")
+
+###################################################################################################
+
 @route('/video/netflix/us/menuitem')
-def MenuItem(url, title, start_index = 0, max_results = 50):
-  oc = ObjectContainer(title2 = title)
+def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerContent.Mixed):
+  oc = ObjectContainer(title2 = title, content = content)
 
   # Separate out the specified parameters from the original URL
   params = {}
@@ -85,6 +93,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50):
   # Add the additional parameters to ensure that we get all of the required items expaned.
   params['expand'] = '@title,@box_art,@synopsis,@directors,@seasons,@episodes'
   menu_item_url = US_Account.GetAPIURL(url, params = params)
+  Log("EXPANDED: " + menu_item_url)
   menu_item = XML.ElementFromURL(menu_item_url)
 
   for item in menu_item.xpath('//catalog_title'):
@@ -109,7 +118,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50):
     # TV Shows
     elif TVSHOW_PATTERN.match(item_details['id']):
       oc.add(TVShowObject(
-        key = Callback(MenuItem, url = item_details['season_url'], title = item_details['title']),
+        key = Callback(MenuItem, url = item_details['season_url'], title = item_details['title'], content = ContainerContent.Seasons),
         rating_key = item_details['id'],
         title = item_details['title'],
         thumb = item_details['thumb'][0],
@@ -122,7 +131,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50):
     # TV Show Seasons
     elif SEASON_PATTERN.match(item_details['id']):
       oc.add(SeasonObject(
-        key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title']),
+        key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title'], content = ContainerContent.Episodes),
         rating_key = item_details['id'],
         title = item_details['title'],
         thumb = item_details['thumb'][0],
