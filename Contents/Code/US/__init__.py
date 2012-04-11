@@ -93,7 +93,6 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
   # Add the additional parameters to ensure that we get all of the required items expaned.
   params['expand'] = '@title,@box_art,@synopsis,@directors,@seasons,@episodes'
   menu_item_url = US_Account.GetAPIURL(url, params = params)
-  Log("EXPANDED: " + menu_item_url)
   menu_item = XML.ElementFromURL(menu_item_url)
 
   for item in menu_item.xpath('//catalog_title'):
@@ -166,6 +165,10 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
       oc.add(DirectoryObject(
         key = Callback(MenuItem, url = url, title = title, start_index = start_index + max_results, max_results = max_results), 
         title = "Next..."))
+
+  # Check to see if we have any results
+  if len(oc) == 0:
+    return MessageContainer('No Results','No results were found')
 
   return oc
 
