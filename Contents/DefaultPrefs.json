@@ -11,11 +11,5 @@
         "label": "Password",
         "default": "",
         "option": "hidden" 
-    },
-    {
-        "id": "cookieallow",
-        "type": "bool",
-        "label": "Allow Netflix Cookie",
-        "default": "true"
     }
 ]
