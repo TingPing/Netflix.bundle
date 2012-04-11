@@ -145,6 +145,8 @@ class US_Account(object):
   @staticmethod
   def LoggedIn():
 
+    Log("Testing logged in status")
+
     username = Prefs['username']
     password = Prefs['password']
 
@@ -167,13 +169,17 @@ class US_Account(object):
         Log("Access Token Valid")
         return True
 
+    Log("No Access Token")
     return False
 
   @staticmethod
   def TryLogIn():
 
+    Log("Attempting to log in")
+
     # If we're already logged in, no need to try again...
     if US_Account.LoggedIn():
+      Log("Already logged in")
       return True
 
     username = Prefs['username']
@@ -190,6 +196,7 @@ class US_Account(object):
               'password1': password,
               'RememberMe': 'True'}
 
+    Log("Logging into site")
     page_content = HTTP.Request('https://www.netflix.com/Login', values, cacheTime = 0).content
 
     original_params = {'oauth_callback': '', 
@@ -202,14 +209,17 @@ class US_Account(object):
                        'x':'166',
                        'y':'13'}
 
+    Log("Attempting to accept OAuth request token")
     page_content = HTTP.Request('https://api-user.netflix.com/oauth/login', original_params, cacheTime = 0).content
     page = HTML.ElementFromString(page_content)
 
     access_token = request.get_access_token(request_token)
+
+    Log("Saving Access Token")
     Dict['accesstoken'] = access_token.to_string()
     Dict.Save()
 
-    return False
+    return US_Account.LoggedIn()
 
   @staticmethod
   def GetUserId():
