@@ -3,6 +3,8 @@ from us_account import US_Account
 
 ICON_MOVIES     = 'icon-movie.png'
 
+SEARCH_URL      = 'http://api.netflix.com/catalog/titles?v=2.0&term=%s&filters=http://api.netflix.com/categories/title_formats/instant'
+
 MOVIE_PATTERN   = Regex('^http://api.netflix.com/catalog/titles/movies/[0-9]+$')
 TVSHOW_PATTERN  = Regex('^http://api.netflix.com/catalog/titles/series/[0-9]+$')
 SEASON_PATTERN  = Regex('^http://api.netflix.com/catalog/titles/series/[0-9]+/seasons/[0-9]+$')
@@ -35,6 +37,9 @@ def MainMenu():
       title = item.get('title')
       oc.add(DirectoryObject(key = Callback(MenuItem, url = url, title = title), title = title))
 
+    # Add a Search option
+    oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...'))
+
   else:
 
     # The user has not yet provided valid credentials. Therefore, we should allow them to be redirected
@@ -53,6 +58,12 @@ def FreeTrial():
   webbrowser.open(url, new=1, autoraise=True)
   return MessageContainer("Free Trial Signup", """A browser has been opened so that you may sign up for a free trial.  If you do not have a mouse 
       and keyboard handy, visit http://www.netflix.com and sign up for free today!""")
+
+###################################################################################################
+
+@route('/video/netflix/us/search')
+def Search(query):
+  return MenuItem(SEARCH_URL % query, query)
 
 ###################################################################################################
 

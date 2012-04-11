@@ -185,6 +185,10 @@ class US_Account(object):
     username = Prefs['username']
     password = Prefs['password']
 
+    if not username or not password:
+      Log("No Username or Password set")
+      return False
+
     request = NetflixRequest()
     request_token = request.get_request_token()
 

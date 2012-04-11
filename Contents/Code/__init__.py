@@ -5,6 +5,7 @@ import US
 TITLE           = 'Netflix'
 ART             = 'art-default.png'
 ICON_DEFAULT    = 'icon-default.png'
+ICON_SEARCH     = 'icon-search.png'
 
 ###################################################################################################
 
@@ -22,6 +23,8 @@ def Start():
   DirectoryObject.art = R(ART)
   VideoClipObject.thumb = R(ICON_DEFAULT)
   VideoClipObject.art = R(ART)
+  InputDirectoryObject.thumb = R(ICON_SEARCH)
+  InputDirectoryObject.art = R(ART)
 
 ###################################################################################################
 
