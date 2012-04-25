@@ -270,6 +270,11 @@ def ParseCatalogueItem(item):
 ###################################################################################################
 
 def SetRating(key, rating):
+
+  # The provided rating will be a value between 0 and 10. However, Netflix expects an interger 
+  # between 1 and 5. Therefore, we must translate...
+  netflix_rating = int(rating / 2)
+  US_Account.SetTitleRating(key, netflix_rating)
   pass
 
 ###################################################################################################

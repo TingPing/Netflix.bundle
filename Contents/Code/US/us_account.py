@@ -189,45 +189,50 @@ class US_Account(object):
       Log("No Username or Password set")
       return False
 
-    request = NetflixRequest()
-    request_token = request.get_request_token()
+    try:
+      request = NetflixRequest()
+      request_token = request.get_request_token()
 
-    values = {'nextpage': 'http://www.netflix.com/',
-              'SubmitButton': 'Click Here to Continue',
-              'movieid': '',
-              'trkid': '',
-              'email': username,
-              'password1': password,
-              'RememberMe': 'True'}
+      values = {'nextpage': 'http://www.netflix.com/',
+                'SubmitButton': 'Click Here to Continue',
+                'movieid': '',
+                'trkid': '',
+                'email': username,
+                'password1': password,
+                'RememberMe': 'True'}
 
-    Log("Logging into site")
-    page_content = HTTP.Request('https://www.netflix.com/Login', values, cacheTime = 0).content
-    page = HTML.ElementFromString(page_content)
-    if len(page.xpath('//body[@id="page-LOGIN"]')) > 0:
-      Log('Logon failed')
+      Log("Logging into site")
+      page_content = HTTP.Request('https://www.netflix.com/Login', values, cacheTime = 0).content
+      page = HTML.ElementFromString(page_content)
+      if len(page.xpath('//body[@id="page-LOGIN"]')) > 0:
+        Log('Logon failed')
+        return False
+
+      original_params = {'oauth_callback': '', 
+                         'oauth_token': request_token.key, 
+                         'application_name':'Plex', 
+                         'oauth_consumer_key': CONSUMER_KEY,
+                         'accept_tos': 'checked', 
+                         'login': username, 
+                         'password': password,
+                         'x':'166',
+                         'y':'13'}
+
+      Log("Attempting to accept OAuth request token")
+      page_content = HTTP.Request('https://api-user.netflix.com/oauth/login', original_params, cacheTime = 0).content
+      page = HTML.ElementFromString(page_content)
+
+      access_token = request.get_access_token(request_token)
+
+      Log("Saving Access Token")
+      Dict['accesstoken'] = access_token.to_string()
+      Dict.Save()
+
+      return US_Account.LoggedIn()
+
+    except:
+      Log.Exception("An error occurred while attempting to determine login status")
       return False
-
-    original_params = {'oauth_callback': '', 
-                       'oauth_token': request_token.key, 
-                       'application_name':'Plex', 
-                       'oauth_consumer_key': CONSUMER_KEY,
-                       'accept_tos': 'checked', 
-                       'login': username, 
-                       'password': password,
-                       'x':'166',
-                       'y':'13'}
-
-    Log("Attempting to accept OAuth request token")
-    page_content = HTTP.Request('https://api-user.netflix.com/oauth/login', original_params, cacheTime = 0).content
-    page = HTML.ElementFromString(page_content)
-
-    access_token = request.get_access_token(request_token)
-
-    Log("Saving Access Token")
-    Dict['accesstoken'] = access_token.to_string()
-    Dict.Save()
-
-    return US_Account.LoggedIn()
 
   @staticmethod
   def GetUserId():
@@ -247,3 +252,31 @@ class US_Account(object):
     request = NetflixRequest()
     access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
     return request.make_query(access_token = access_token, method = 'GET', query = url, params = params, returnURL = True)
+
+  @staticmethod
+  def GetTitleRating(title_ref):
+
+    request = NetflixRequest()
+    access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
+    url = request.make_query(access_token = access_token, method = 'GET', query = 'http://api.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref })
+
+    details = XML.ElementFromURL(url)
+
+    return True
+
+  @staticmethod
+  def SetTitleRating(title_ref, rating):
+
+    Log("Attempting to set rating (%s) for title (%s)" % (title_ref, rating))
+    request = NetflixRequest()
+    access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
+    url = request.make_query(access_token = access_token, method = 'POST', query = 'http://api.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref, 'rating': str(rating) })
+
+    details = XML.ElementFromURL(url)
+    Log(XMl.StringFromElement(details))
+
+    return True
+
+  @staticmethod
+  def IDFromURL(url):
+    return re.match('http://(www|api).netflix.com/.+/(?P<id>[0-9]+)', url).groupdict()['id']
