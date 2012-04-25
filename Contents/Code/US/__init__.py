@@ -102,8 +102,8 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
     # Movies
     if MOVIE_PATTERN.match(item_details['id']):
       oc.add(MovieObject(
+        key = Callback(Lookup, type = "Movie", url = item_details['url'], rating_key = item_details['id']),
         items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, url = item_details['url']))], protocol = 'webkit') ],
-        key = item_details['id'],
         rating_key = item_details['id'],
         title = item_details['title'],
         thumb = item_details['thumb'][0],
@@ -140,8 +140,8 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
     # TV Episodes
     elif EPISODE_PATTERN.match(item_details['id']):
       oc.add(EpisodeObject(
+        key = Callback(Lookup, type = "Episode", url = item_details['url'], rating_key = item_details['id']),
         items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, url = item_details['url']))], protocol = 'webkit') ],
-        key = item_details['id'],
         rating_key = item_details['id'],
         title = item_details['title'],
         show = item_details['show'],
@@ -279,13 +279,32 @@ def SetRating(key, rating):
 
 ###################################################################################################
 
+@route('/video/netflix/us/lookup')
+def Lookup(type, url, rating_key):
+  oc = ObjectContainer()
+
+  if type == "Movie":
+    oc.add(MovieObject(
+      key = Callback(Lookup, type = type, url = url, rating_key = rating_key),
+      rating_key = rating_key,
+      items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, url = url))], protocol = 'webkit') ] ))
+  else:
+    oc.add(EpisodeObject(
+      key = Callback(Lookup, type = type, url = url, rating_key = rating_key),
+      rating_key = rating_key,
+      items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, url = url))], protocol = 'webkit') ] ))
+
+  return oc
+
+###################################################################################################
+
 @route('/video/netflix/us/playvideo')
 def PlayVideo(url):
-
   movie_id = re.match('http://www.netflix.com/Movie/.+/(?P<id>[0-9]+)', url).groupdict()['id']
   player_url = 'http://www.netflix.com/WiPlayer?movieid=%s' % movie_id
   user_url = "http://api.netflix.com/users/%s" % US_Account.GetUserId()
 
   params = {'movieid': movie_id, 'user': user_url}
   video_url = US_Account.GetAPIURL(player_url, params = params)
+
   return Redirect(WebVideoURL(video_url))
