@@ -201,13 +201,6 @@ class US_Account(object):
                 'password1': password,
                 'RememberMe': 'True'}
 
-      Log("Logging into site")
-      page_content = HTTP.Request('https://www.netflix.com/Login', values, cacheTime = 0).content
-      page = HTML.ElementFromString(page_content)
-      if len(page.xpath('//body[@id="page-LOGIN"]')) > 0:
-        Log('Logon failed')
-        return False
-
       original_params = {'oauth_callback': '', 
                          'oauth_token': request_token.key, 
                          'application_name':'Plex', 
