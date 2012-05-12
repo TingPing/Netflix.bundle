@@ -11,5 +11,12 @@
         "label": "Password",
         "default": "",
         "option": "hidden" 
+    },
+    {
+        "id": "playbackpreference",
+        "type": "enum",
+        "label": "Playback",
+        "values": [ "Restart", "Resume", "Ask" ],
+        "default": "Restart"
     }
 ]

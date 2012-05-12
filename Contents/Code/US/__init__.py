@@ -101,18 +101,40 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
 
     # Movies
     if MOVIE_PATTERN.match(item_details['id']):
-      oc.add(MovieObject(
-        key = Callback(Lookup, type = "Movie", url = item_details['url'], rating_key = item_details['id']),
-        items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Movie", url = item_details['url'], rating_key = item_details['id']))], protocol = 'webkit') ],
-        rating_key = item_details['id'],
-        title = item_details['title'],
-        thumb = item_details['thumb'][0],
-        summary = item_details['summary'],
-        genres = item_details['genres'],
-        directors = item_details['directors'],
-        duration = item_details['duration'],
-        rating = item_details['rating'],
-        content_rating = item_details['content_rating']))
+
+      if Prefs['playbackpreference'] != "Ask":
+        video_url = PlaybackURL(item_details['url'], Prefs['playbackpreference'])
+        oc.add(MovieObject(
+          key = Callback(Lookup, type = "Movie", url = video_url, rating_key = item_details['id']),
+          items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Movie", url = video_url, rating_key = item_details['id']))], protocol = 'webkit') ],
+          rating_key = item_details['id'],
+          title = item_details['title'],
+          thumb = item_details['thumb'][0],
+          summary = item_details['summary'],
+          genres = item_details['genres'],
+          directors = item_details['directors'],
+          duration = item_details['duration'],
+          rating = item_details['rating'],
+          content_rating = item_details['content_rating']))
+      else:
+        oc.add(DirectoryObject(
+          key = Callback(
+            PlaybackSelection,
+            url = item_details['url'],
+            title = item_details['title'],
+            type = "Movie",
+            rating_key = item_details['id'],
+            thumb = item_details['thumb'][0],
+            summary = item_details['summary'],
+            directors = item_details['directors'],
+            duration = item_details['duration'],
+            rating = item_details['rating'],
+            content_rating = item_details['content_rating'],
+            genres = item_details['genres']),
+          title = item_details['title'],
+          thumb = item_details['thumb'][0],
+          summary = item_details['summary'],
+          duration = item_details['duration']))
 
     # TV Shows
     elif TVSHOW_PATTERN.match(item_details['id']):
@@ -139,21 +161,43 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
 
     # TV Episodes
     elif EPISODE_PATTERN.match(item_details['id']):
-      oc.add(EpisodeObject(
-        key = Callback(Lookup, type = "Episode", url = item_details['url'], rating_key = item_details['id']),
-        items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = item_details['url'], rating_key = item_details['id']))], protocol = 'webkit') ],
-        rating_key = item_details['id'],
-        title = item_details['title'],
-        show = item_details['show'],
-        season = item_details['season_index'],
-        index = item_details['episode_index'],
-        thumb = item_details['thumb'][0],
-        summary = item_details['summary'],
-        directors = item_details['directors'],
-        duration = item_details['duration'],
-        rating = item_details['rating'],
-        content_rating = item_details['content_rating']))
-
+      if Prefs['playbackpreference'] != "Ask":
+        video_url = PlaybackURL(item_details['url'], Prefs['playbackpreference'])
+        oc.add(EpisodeObject(
+          key = Callback(Lookup, type = "Episode", url = item_details['url'], rating_key = item_details['id']),
+          items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = item_details['url'], rating_key = item_details['id']))], protocol = 'webkit') ],
+          rating_key = item_details['id'],
+          title = item_details['title'],
+          show = item_details['show'],
+          season = item_details['season_index'],
+          index = item_details['episode_index'],
+          thumb = item_details['thumb'][0],
+          summary = item_details['summary'],
+          directors = item_details['directors'],
+          duration = item_details['duration'],
+          rating = item_details['rating'],
+          content_rating = item_details['content_rating']))
+      else:
+        oc.add(DirectoryObject(
+          key = Callback(
+            PlaybackSelection,
+            url = item_details['url'],
+            title = item_details['title'],
+            type = "Episode",
+            rating_key = item_details['id'],
+            thumb = item_details['thumb'][0],
+            summary = item_details['summary'],
+            directors = item_details['directors'],
+            duration = item_details['duration'],
+            rating = item_details['rating'],
+            content_rating = item_details['content_rating'],
+            show = item_details['show'],
+            season = item_details['season_index'],
+            index = item_details['episode_index']),
+          title = item_details['title'],
+          thumb = item_details['thumb'][0],
+          summary = item_details['summary'],
+          duration = item_details['duration']))
 
   # If there are further results, add an item to allow them to be browsed.
   start_index = int(start_index)
@@ -276,6 +320,82 @@ def SetRating(key, rating):
   netflix_rating = int(rating / 2)
   US_Account.SetTitleRating(key, netflix_rating)
   pass
+
+###################################################################################################
+def PlaybackURL(url, preference):
+  if preference == "Resume":
+    return url + '#resume'
+
+  return url
+
+###################################################################################################
+
+@route('/video/netflix/us/playbackselection', directors = list, duration = int, rating = float, genres = list)
+def PlaybackSelection(url, title, type, rating_key, thumb, summary, directors, duration, rating, content_rating, genres = None, show = None, season = None, index = None):
+  oc = ObjectContainer(title2 = title)
+
+  if type == "Movie":
+    video_url = PlaybackURL(url, "Restart")
+    oc.add(MovieObject(
+      key = Callback(Lookup, type = "Movie", url = video_url, rating_key = rating_key),
+      items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Movie", url = video_url, rating_key = rating_key))], protocol = 'webkit') ],
+      rating_key = rating_key,
+      title = "Restart",
+      thumb = thumb,
+      summary = summary,
+      genres = genres,
+      directors = directors,
+      duration = duration,
+      rating = rating,
+      content_rating = content_rating))
+    video_url = PlaybackURL(url, "Resume")
+    oc.add(MovieObject(
+      key = Callback(Lookup, type = "Movie", url = video_url, rating_key = rating_key),
+      items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Movie", url = video_url, rating_key = rating_key))], protocol = 'webkit') ],
+      rating_key = rating_key,
+      title = "Resume",
+      thumb = thumb,
+      summary = summary,
+      genres = genres,
+      directors = directors,
+      duration = duration,
+      rating = rating,
+      content_rating = content_rating))
+
+  elif type == "Episode":
+    video_url = PlaybackURL(url, "Restart")
+    oc.add(EpisodeObject(
+      key = Callback(Lookup, type = "Episode", url = video_url, rating_key = rating_key),
+      items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = video_url, rating_key = rating_key))], protocol = 'webkit') ],
+      rating_key = rating_key,
+      title = "Restart",
+      show = show,
+      season = season,
+      index = index,
+      thumb = thumb,
+      summary = summary,
+      directors = directors,
+      duration = duration,
+      rating = rating,
+      content_rating = content_rating))
+
+    video_url = PlaybackURL(url, "Resume")
+    oc.add(EpisodeObject(
+      key = Callback(Lookup, type = "Episode", url = video_url, rating_key = rating_key),
+      items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = video_url, rating_key = rating_key))], protocol = 'webkit') ],
+      rating_key = rating_key,
+      title = "Resume",
+      show = show,
+      season = season,
+      index = index,
+      thumb = thumb,
+      summary = summary,
+      directors = directors,
+      duration = duration,
+      rating = rating,
+      content_rating = content_rating))
+
+  return oc
 
 ###################################################################################################
 
