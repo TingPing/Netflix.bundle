@@ -164,8 +164,8 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
       if Prefs['playbackpreference'] != "Ask":
         video_url = PlaybackURL(item_details['url'], Prefs['playbackpreference'])
         oc.add(EpisodeObject(
-          key = Callback(Lookup, type = "Episode", url = item_details['url'], rating_key = item_details['id']),
-          items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = item_details['url'], rating_key = item_details['id']))], protocol = 'webkit') ],
+          key = Callback(Lookup, type = "Episode", url = video_url, rating_key = item_details['id']),
+          items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = video_url, rating_key = item_details['id']))], protocol = 'webkit') ],
           rating_key = item_details['id'],
           title = item_details['title'],
           show = item_details['show'],
