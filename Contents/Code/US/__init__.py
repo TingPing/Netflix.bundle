@@ -330,9 +330,13 @@ def PlaybackURL(url, preference):
 
 ###################################################################################################
 
-@route('/video/netflix/us/playbackselection', directors = list, duration = int, rating = float, genres = list)
+@route('/video/netflix/us/playbackselection', directors = list, duration = int, genres = list, season = int, index = int)
 def PlaybackSelection(url, title, type, rating_key, thumb, summary, directors, duration, rating, content_rating, genres = None, show = None, season = None, index = None):
   oc = ObjectContainer(title2 = title)
+
+  # We have to deal with the fact that Ratings might actually be None for TV Shows
+  try: rating = float(rating)
+  except: rating = None
 
   if type == "Movie":
     video_url = PlaybackURL(url, "Restart")
