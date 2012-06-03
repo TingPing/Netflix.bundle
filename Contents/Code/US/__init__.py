@@ -2,6 +2,8 @@ import cgi
 from us_account import US_Account
 
 ICON_MOVIES     = 'icon-movie.png'
+ICON_PREFS      = 'icon-prefs.png'
+ICON_SEARCH     = 'icon-search.png'
 
 SEARCH_URL      = 'http://api.netflix.com/catalog/titles?v=2.0&term=%s&filters=http://api.netflix.com/categories/title_formats/instant'
 
@@ -27,7 +29,7 @@ def MainMenu():
     
     oc.add(DirectoryObject(key = Callback(UserList), title = 'TV & Movies'))
     oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue'), title = 'Instant Queue'))
-    oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...'))
+    oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...', thumb = R(ICON_SEARCH)))
 
   else:
 
@@ -35,7 +37,7 @@ def MainMenu():
     # to sign up for a free trial.
     oc.add(DirectoryObject(key = Callback(FreeTrial), title = 'Sign up for free trial', thumb = R(ICON_MOVIES)))
 
-  oc.add(PrefsObject(title = 'Preferences'))
+  oc.add(PrefsObject(title = 'Preferences', thumb = R(ICON_PREFS)))
 
   return oc
 
