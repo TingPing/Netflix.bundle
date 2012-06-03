@@ -202,7 +202,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
   # If there are further results, add an item to allow them to be browsed.
   start_index = int(start_index)
   max_results = int(max_results)
-  number_of_results_node = menu_item.xpath('//catalog/number_of_results/text()')
+  number_of_results_node = menu_item.xpath('//number_of_results/text()')
   if len(number_of_results_node) > 0:
     number_of_results = int(number_of_results_node[0])
     if number_of_results > (start_index + max_results):
