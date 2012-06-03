@@ -434,6 +434,11 @@ def PlayVideo(type, url, rating_key, indirect = None):
   params = {'movieid': movie_id, 'user': user_url}
   video_url = US_Account.GetAPIURL(player_url, params = params)
 
+  # If the #resume tag was specified, ensure that it's copied to the final webkit URL
+  if url.endswith('#resume'):
+    video_url = video_url + '#resume'
+  Log("Final WebKit URL: " + video_url)
+
   oc.add(VideoClipObject(
     key = Callback(Lookup, type = type, url = url, rating_key = rating_key),
     rating_key = rating_key,
