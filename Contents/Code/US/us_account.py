@@ -2,15 +2,15 @@
 import re, cgi, urllib, httplib, sys
 import oauth
 
-NETFLIX_SERVER = 'api.netflix.com'
+NETFLIX_SERVER = 'api-public.netflix.com'
 NETFLIX_PORT   = 80
 
 NETFLIX_VERSION = '1.5'
 
-REQUEST_TOKEN_URL = 'http://api.netflix.com/oauth/request_token'
-ACCESS_TOKEN_URL  = 'http://api.netflix.com/oauth/access_token'
-AUTHORIZATION_URL = 'https://api-user.netflix.com/oauth/login'
-API_URL = 'http://api.netflix.com/'
+REQUEST_TOKEN_URL = 'http://api-public.netflix.com/oauth/request_token'
+ACCESS_TOKEN_URL  = 'http://api-public.netflix.com/oauth/access_token'
+AUTHORIZATION_URL = 'https://api-public.netflix.com/oauth/login'
+API_URL = 'http://api-public.netflix.com/'
 
 CONSUMER_KEY    = 'nfeafbf2hpdnyfvr5dd32ka6'
 CONSUMER_SECRET = 'bBsa6TqYab'
@@ -158,7 +158,7 @@ class US_Account(object):
       Log("Testing Access Token")
       access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
       request = NetflixRequest()
-      status = request.make_query(access_token = access_token, query = 'http://api.netflix.com/users/%s' % access_token.user_id, returnURL = False).status
+      status = request.make_query(access_token = access_token, query = 'http://api-public.netflix.com/users/%s' % access_token.user_id, returnURL = False).status
 
       if status == 401:
         del Dict['accesstoken']
@@ -232,12 +232,12 @@ class US_Account(object):
 
     request = NetflixRequest()
     access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
-    url = request.make_query(access_token = access_token, method = 'GET', query = 'http://api.netflix.com/users/current', params = { 'v': '2' })
+    url = request.make_query(access_token = access_token, method = 'GET', query = 'http://api-public.netflix.com/users/current', params = { 'v': '2' })
 
     details = XML.ElementFromURL(url)
     user_url = details.xpath('//resource/link')[0].get('href')
 
-    return re.match('http://api.netflix.com/users/(?P<id>.+)', user_url).groupdict()['id']
+    return re.match('http://(.)+\.netflix.com/users/(?P<id>.+)', user_url).groupdict()['id']
 
   @staticmethod
   def GetAPIURL(url, params = {}):
@@ -251,7 +251,7 @@ class US_Account(object):
 
     request = NetflixRequest()
     access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
-    url = request.make_query(access_token = access_token, method = 'GET', query = 'http://api.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref })
+    url = request.make_query(access_token = access_token, method = 'GET', query = 'http://api-public.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref })
 
     details = XML.ElementFromURL(url)
 
@@ -263,7 +263,7 @@ class US_Account(object):
     Log("Attempting to set rating (%s) for title (%s)" % (title_ref, rating))
     request = NetflixRequest()
     access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
-    url = request.make_query(access_token = access_token, method = 'POST', query = 'http://api.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref, 'rating': str(rating) })
+    url = request.make_query(access_token = access_token, method = 'POST', query = 'http://api-public.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref, 'rating': str(rating) })
 
     details = XML.ElementFromURL(url)
     Log(XMl.StringFromElement(details))
@@ -272,4 +272,4 @@ class US_Account(object):
 
   @staticmethod
   def IDFromURL(url):
-    return re.match('http://(www|api).netflix.com/.+/(?P<id>[0-9]+)', url).groupdict()['id']
+    return re.match('http://(.)+\.netflix.com/.+/(?P<id>[0-9]+)', url).groupdict()['id']

@@ -5,12 +5,12 @@ ICON_MOVIES     = 'icon-movie.png'
 ICON_PREFS      = 'icon-prefs.png'
 ICON_SEARCH     = 'icon-search.png'
 
-SEARCH_URL      = 'http://api.netflix.com/catalog/titles?v=2.0&term=%s&filters=http://api.netflix.com/categories/title_formats/instant'
+SEARCH_URL      = 'http://api-public.netflix.com/catalog/titles?v=2.0&term=%s&filters=http://api-public.netflix.com/categories/title_formats/instant'
 
-MOVIE_PATTERN   = Regex('^http://api.netflix.com/catalog/titles/movies/[0-9]+$')
-TVSHOW_PATTERN  = Regex('^http://api.netflix.com/catalog/titles/series/[0-9]+$')
-SEASON_PATTERN  = Regex('^http://api.netflix.com/catalog/titles/series/[0-9]+/seasons/[0-9]+$')
-EPISODE_PATTERN = Regex('^http://api.netflix.com/catalog/titles/programs/[0-9]+/[0-9]+')
+MOVIE_PATTERN   = Regex('^http://(.)+\.netflix.com/catalog/titles/movies/[0-9]+$')
+TVSHOW_PATTERN  = Regex('^http://(.)+\.netflix.com/catalog/titles/series/[0-9]+$')
+SEASON_PATTERN  = Regex('^http://(.)+\.netflix.com/catalog/titles/series/[0-9]+/seasons/[0-9]+$')
+EPISODE_PATTERN = Regex('^http://(.)+\.netflix.com/catalog/titles/programs/[0-9]+/[0-9]+')
 
 EPISODE_TITLE_PATTERN = Regex('^S(?P<season>[0-9]+):E(?P<episode>[0-9]+) - (?P<title>.+)$')
 
@@ -28,7 +28,7 @@ def MainMenu():
   if logged_in:
     
     oc.add(DirectoryObject(key = Callback(UserList), title = 'TV & Movies'))
-    oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue'), title = 'Instant Queue'))
+    oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api-public.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue'), title = 'Instant Queue'))
     oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...', thumb = R(ICON_SEARCH)))
 
   else:
@@ -49,7 +49,7 @@ def UserList():
   oc = ObjectContainer()
 
   user_id = US_Account.GetUserId()
-  user_list_url = US_Account.GetAPIURL('http://api.netflix.com/users/%s/lists' % user_id, params = { 'v': '2', 'client': 'plex' })
+  user_list_url = US_Account.GetAPIURL('http://api-public.netflix.com/users/%s/lists' % user_id, params = { 'v': '2', 'client': 'plex' })
   user_list = XML.ElementFromURL(user_list_url)
 
   # Add the found items
@@ -234,7 +234,7 @@ def ParseCatalogueItem(item):
   directors = item.xpath('.//link[contains(@title, "directors")]/people/link')
   directors = [ director.get('title') for director in directors ]
 
-  genres = item.xpath('.//category[contains(@scheme, "http://api.netflix.com/categories/genres")]')
+  genres = item.xpath('.//category[contains(@scheme, "/categories/genres")]')
   genres = [ genre.get('label') for genre in genres]
 
   # [Optional]
@@ -431,7 +431,7 @@ def PlayVideo(type, url, rating_key, indirect = None):
 
   movie_id = re.match('http://www.netflix.com/Movie/.+/(?P<id>[0-9]+)', url).groupdict()['id']
   player_url = 'http://www.netflix.com/WiPlayer?movieid=%s' % movie_id
-  user_url = "http://api.netflix.com/users/%s" % US_Account.GetUserId()
+  user_url = "http://api-public.netflix.com/users/%s" % US_Account.GetUserId()
 
   params = {'movieid': movie_id, 'user': user_url}
   video_url = US_Account.GetAPIURL(player_url, params = params)

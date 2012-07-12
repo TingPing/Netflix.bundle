@@ -7,6 +7,8 @@ ART             = 'art-default.png'
 ICON_DEFAULT    = 'icon-default.png'
 ICON_SEARCH     = 'icon-search.png'
 
+HTTP.Headers['Accept-Encoding'] = 'gzip,sdch'
+
 ###################################################################################################
 
 def Start():
