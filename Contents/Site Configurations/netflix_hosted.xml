@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site site="http://www\.netflix\.com/WiPlayer.*oauth_nonce="
-	    plugin="silverlight"
-			initialState="init"
+        plugin="silverlight"
+            initialState="init"
       finalState="cleanup"
-			windowWidth="1280"
-			windowHeight="720"
+            windowWidth="1280"
+            windowHeight="720"
       agent="Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_6; en-gb) AppleWebKit/528.16 (KHTML, like Gecko) Version/4.0 Safari/528.16"
-			identifier="com.plexapp.plugins.netflix"
-			version="1.0">
+            identifier="com.plexapp.plugins.netflix"
+            version="1.0">
 
-	<crop x="0" y="0" width="0" height="0" />
+    <crop x="0" y="0" width="0" height="0" />
 
 <!--
     <seekbar type="javascript">
@@ -32,33 +32,13 @@
         </event>
     </state>
 
-    <state name="cookiehandle">
-        <event>
-            <condition>
-                <frameLoaded/>
-            </condition>
-            <action>
-                <run script="netflix.Silverlight.MoviePlayer.register_cookieprompt_handler( function(){ netflix.Silverlight.MoviePlayer.cookieprompt_response( true, false ); } );"/>
-                <goto state="init"/>
-            </action>
-        </event>
-    </state>
-	
     <state name="init">
         <event>
             <condition>
-                <title matches="^Netflix: Netflix Movie Viewer$"/>
+                <title matches="^Netflix$"/>
             </condition>
             <action>
                 <goto state="do_open"/>
-            </action>
-        </event>
-        <event>
-            <condition>
-                <title matches="^Netflix: Netflix Movie Viewer - Free Trial$"/>
-            </condition>
-            <action>
-                <goto state="cookiehandle"/>
             </action>
         </event>
     </state>
@@ -72,7 +52,7 @@
                 <goto state="do_open_really" />
             </action>
         </event>
-		</state>
+    </state>
 
     <state name="do_open_really">
         <event>
@@ -121,231 +101,231 @@
         </event>
     </state>
 
-	<state name="playing">
+    <state name="playing">
 
-		<event>
-			<condition>
+        <event>
+            <condition>
                 <command name="pause" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.pause();"/>
                 <pause time="50"/>
                 <goto state="paused"/>
-			</action>
-		</event>
+            </action>
+        </event>
 
-		<event>
-			<condition>
+        <event>
+            <condition>
                 <command name="chapter+" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_enter()"/>
                 <pause time="50"/>
                 <goto state="trickplay"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="chapter-" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_enter()"/>
                 <pause time="50"/>
                 <goto state="trickplay"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="bigstep+" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_enter()"/>
                 <pause time="50"/>
                 <goto state="trickplay"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="bigstep-" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_enter()"/>
                 <pause time="50"/>
                 <goto state="trickplay"/>
-			</action>
-		</event>
+            </action>
+        </event>
 
-		<event>
-			<condition>
+        <event>
+            <condition>
                 <command name="smallstep+" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_enter()"/>
                 <pause time="50"/>
                 <goto state="trickplay"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="smallstep-" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_enter()"/>
                 <pause time="50"/>
                 <goto state="trickplay"/>
-			</action>
-		</event>
+            </action>
+        </event>
 
-	</state>
+    </state>
 
-	<state name="paused">
-		<event>
-			<condition>
+    <state name="paused">
+        <event>
+            <condition>
                 <command name="play" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <pause time="100"/>
                 <run script="NF.play();"/>
                 <goto state="playing"/>
-			</action>
-		</event>
+            </action>
+        </event>
         <event>
-			<condition>
+            <condition>
                 <javascript script="NF.play_state==103 ? 1 : 0" matches="1"/>
-			</condition>
+            </condition>
             <action>
                 <pause time="100"/>
                 <goto state="trickplay"/>
             </action>
         </event>
         <event>
-			<condition>
+            <condition>
                 <!-- hmmm the player is playing... pause to force back into 
                      the pause state for consistency.., this usually
                      happens when "trick playing" -->
                 <javascript script="NF.play_state==101 ? 1 : 0" matches="1"/>
-			</condition>
+            </condition>
             <action>
                 <pause time="100"/>
                 <run script="NF.pause();"/>
             </action>
         </event>
-	</state>
+    </state>
 
 <!-- BUFFERING -->
     <state name="buffering">
-		<event>
-			<condition>
+        <event>
+            <condition>
                 <command name="pause"/>
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <pause time="100"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="play"/>
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <pause time="100"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <javascript script="NF.play_state==101 ? 1 : 0" matches="1"/>
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <pause time="100"/>
                 <goto state="playing"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <javascript script="NF.play_state==999 ? 1 : 0" matches="1"/>
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="netflix.Silverlight.MoviePlayer.get_hosted_player_control().close();"/>
                 <pause time="7000"/>
                 <goto state="end" param="Netflix player encountered an error"/>
-			</action>
-		</event>
+            </action>
+        </event>
     </state>
 
 <!-- TRICKPLAY -->
-	<state name="trickplay">
-		<event>
-			<condition>
+    <state name="trickplay">
+        <event>
+            <condition>
                 <command name="play" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.play();"/>
                 <pause time="100"/>
                 <goto state="buffering"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="pause" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.play();"/>
                 <pause time="100"/>
                 <goto state="buffering"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="smallstep+" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_next();"/>
                 <pause time="50"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="smallstep-" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_previous();"/>
                 <pause time="50"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="bigstep+" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_next();"/>
                 <pause time="50"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="bigstep-" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_previous();"/>
                 <pause time="50"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="chapter+" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_next();"/>
                 <pause time="50"/>
-			</action>
-		</event>
-		<event>
-			<condition>
+            </action>
+        </event>
+        <event>
+            <condition>
                 <command name="chapter-" />
-			</condition>
-			<action>
+            </condition>
+            <action>
                 <run script="NF.trick_play_previous();"/>
                 <pause time="50"/>
-			</action>
-		</event>
-	</state>
+            </action>
+        </event>
+    </state>
 </site>
