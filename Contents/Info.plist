@@ -39,8 +39,6 @@
 	<array>
 		<string>US</string>
 	</array>
-	<key>PlexPluginDevMode</key>
-	<string>1</string>
 	<key>PlexPluginCodePolicy</key>
 	<string>Elevated</string>
 </dict>
