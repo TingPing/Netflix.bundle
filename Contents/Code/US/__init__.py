@@ -436,7 +436,7 @@ def PlayVideo(type, url, rating_key, indirect = None):
   params = {'movieid': movie_id, 'user': user_url}
   video_url = US_Account.GetAPIURL(player_url, params = params)
 
-  # If the&resume=true parameter was specified, ensure that it's copied to the final webkit URL
+  # If the &resume=true parameter was specified, ensure that it's copied to the final webkit URL
   if url.endswith('&resume=true'):
     video_url = video_url + '&resume=true'
   Log("Final WebKit URL: " + video_url)
