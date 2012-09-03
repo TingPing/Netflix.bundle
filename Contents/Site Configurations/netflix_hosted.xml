@@ -83,7 +83,7 @@
             </condition>
             <action>
                 <pause time="100"/>
-                <run script="netflix.Silverlight.MoviePlayer.get_hosted_player_control().open({'show_navigation_panel':false,'show_player_panel':false,'ignore_bookmark':(location.href.indexOf('#resume')!=-1 ? false : true)});"/>
+                <run script="netflix.Silverlight.MoviePlayer.get_hosted_player_control().open({'show_navigation_panel':false,'show_player_panel':false,'ignore_bookmark':(location.href.indexOf('resume=true')!=-1 ? false : true)});"/>
                 <pause time="100"/>
                 <run script="NF=netflix.Silverlight.MoviePlayer.get_hosted_player_control();"/>
                 <pause time="100"/>
