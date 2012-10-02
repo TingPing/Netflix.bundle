@@ -260,7 +260,7 @@ class US_Account(object):
   @staticmethod
   def SetTitleRating(title_ref, rating):
 
-    Log("Attempting to set rating (%s) for title (%s)" % (title_ref, rating))
+    Log("Attempting to set rating (%s) for title (%s)" % (rating, title_ref))
     request = NetflixRequest()
     access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
     url = request.make_query(access_token = access_token, method = 'POST', query = 'http://api-public.netflix.com/users/%s/ratings/title' % US_Account.GetUserId(), params = { 'title_refs': title_ref, 'rating': str(rating) })
@@ -269,6 +269,20 @@ class US_Account(object):
     Log(XMl.StringFromElement(details))
 
     return True
+
+  @staticmethod
+  def RemoveFromQueue(url):
+    entry_id = US_Account.IDFromURL(url)
+
+    Log("Attempting to remove (%s) from queue" % entry_id)
+    request = NetflixRequest()
+    access_token = NetflixAuthToken.from_string(Dict['accesstoken'])
+    status = request.make_query(access_token = access_token, method = 'DELETE', query ='http://api-public.netflix.com/users/%s/queues/instant/available/%s' % (US_Account.GetUserId(), entry_id), returnURL = False).status
+
+    if status == 401:
+      return False
+    else:
+      return True
 
   @staticmethod
   def IDFromURL(url):

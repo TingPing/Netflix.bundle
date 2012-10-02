@@ -28,7 +28,7 @@ def MainMenu():
   if logged_in:
     
     oc.add(DirectoryObject(key = Callback(UserList), title = 'TV & Movies'))
-    oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api-public.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue'), title = 'Instant Queue'))
+    oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api-public.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue', is_queue = True), title = 'Instant Queue'))
     oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...', thumb = R(ICON_SEARCH)))
 
   else:
@@ -77,8 +77,8 @@ def FreeTrial():
 
 ###################################################################################################
 
-@route('/video/netflix/us/menuitem')
-def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerContent.Mixed):
+@route('/video/netflix/us/menuitem', is_queue = bool)
+def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerContent.Mixed, is_queue = False):
   oc = ObjectContainer(title2 = title, content = content)
 
   # Separate out the specified parameters from the original URL
@@ -96,6 +96,9 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
   params['expand'] = '@title,@box_art,@synopsis,@directors,@seasons,@episodes'
   menu_item_url = US_Account.GetAPIURL(url, params = params)
   menu_item = XML.ElementFromURL(menu_item_url)
+
+  # TODO(jk0): Enable this in the next iteration.
+  #show_url = None
 
   for item in menu_item.xpath('//catalog_title'):
 
@@ -132,7 +135,8 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
             duration = item_details['duration'],
             rating = item_details['rating'],
             content_rating = item_details['content_rating'],
-            genres = item_details['genres']),
+            genres = item_details['genres'],
+            is_queue = is_queue),
           title = item_details['title'],
           thumb = item_details['thumb'][0],
           summary = item_details['summary'],
@@ -153,6 +157,9 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
 
     # TV Show Seasons
     elif SEASON_PATTERN.match(item_details['id']):
+      # TODO(jk0): Enable this in the next iteration.
+      #show_url = url
+
       oc.add(SeasonObject(
         key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title'], content = ContainerContent.Episodes),
         rating_key = item_details['id'],
@@ -200,6 +207,14 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
           thumb = item_details['thumb'][0],
           summary = item_details['summary'],
           duration = item_details['duration']))
+
+  # Provide a way to remove a show from the Instant Queue.
+  # TODO(jk0): Enable this in the next iteration.
+  #if is_queue and show_url:
+  #  oc.add(DirectoryObject(
+  #    key = Callback(RemoveFromQueue, url = show_url),
+  #    title = "Remove",
+  #    summary = "Remove this show from your Instant Queue."))
 
   # If there are further results, add an item to allow them to be browsed.
   start_index = int(start_index)
@@ -324,6 +339,15 @@ def SetRating(key, rating):
   pass
 
 ###################################################################################################
+
+@route('/video/netflix/us/removefromqueue')
+def RemoveFromQueue(url):
+    if US_Account.RemoveFromQueue(url):
+        return MessageContainer('Instant Queue', 'The item was removed from your queue.')
+    else:
+        return MessageContainer('Instant Queue', 'There was a problem removing your item from the queue.')
+
+###################################################################################################
 def PlaybackURL(url, preference):
   if preference == "Resume":
     return url + '&resume=true'
@@ -332,8 +356,8 @@ def PlaybackURL(url, preference):
 
 ###################################################################################################
 
-@route('/video/netflix/us/playbackselection', directors = list, duration = int, genres = list, season = int, index = int)
-def PlaybackSelection(url, title, type, rating_key, thumb, summary, directors, duration, rating, content_rating, genres = None, show = None, season = None, index = None):
+@route('/video/netflix/us/playbackselection', directors = list, duration = int, genres = list, season = int, index = int, is_queue = bool)
+def PlaybackSelection(url, title, type, rating_key, thumb, summary, directors, duration, rating, content_rating, genres = None, show = None, season = None, index = None, is_queue = False):
   oc = ObjectContainer(title2 = title)
 
   # We have to deal with the fact that Ratings might actually be None for TV Shows
@@ -355,6 +379,7 @@ def PlaybackSelection(url, title, type, rating_key, thumb, summary, directors, d
       rating = rating,
       content_rating = content_rating))
     video_url = PlaybackURL(url, "Resume")
+
     oc.add(MovieObject(
       key = Callback(Lookup, type = "Movie", url = video_url, rating_key = rating_key),
       items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Movie", url = video_url, rating_key = rating_key))], protocol = 'webkit') ],
@@ -368,6 +393,12 @@ def PlaybackSelection(url, title, type, rating_key, thumb, summary, directors, d
       rating = rating,
       content_rating = content_rating))
 
+    if is_queue:
+      oc.add(DirectoryObject(
+        key = Callback(RemoveFromQueue, url = url),
+        title = "Remove",
+        thumb = thumb,
+        summary = "Remove this movie from your Instant Queue."))
   elif type == "Episode":
     video_url = PlaybackURL(url, "Restart")
     oc.add(EpisodeObject(
