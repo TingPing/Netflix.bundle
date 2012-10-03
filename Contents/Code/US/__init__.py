@@ -343,9 +343,9 @@ def SetRating(key, rating):
 @route('/video/netflix/us/removefromqueue')
 def RemoveFromQueue(url):
     if US_Account.RemoveFromQueue(url):
-        return MessageContainer('Instant Queue', 'The item was removed from your queue.')
+        return ObjectContainer(header='Instant Queue', message='The item was removed from your queue.')
     else:
-        return MessageContainer('Instant Queue', 'There was a problem removing your item from the queue.')
+        return ObjectContainer(header='Instant Queue', message='There was a problem removing your item from the queue.')
 
 ###################################################################################################
 def PlaybackURL(url, preference):
