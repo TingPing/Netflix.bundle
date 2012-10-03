@@ -145,7 +145,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
     # TV Shows
     elif TVSHOW_PATTERN.match(item_details['id']):
       oc.add(TVShowObject(
-        key = Callback(MenuItem, url = item_details['season_url'], title = item_details['title'], content = ContainerContent.Seasons),
+        key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title'], content = ContainerContent.Seasons),
         rating_key = item_details['id'],
         title = item_details['title'],
         thumb = item_details['thumb'][0],
