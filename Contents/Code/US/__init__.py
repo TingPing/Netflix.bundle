@@ -97,8 +97,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
   menu_item_url = US_Account.GetAPIURL(url, params = params)
   menu_item = XML.ElementFromURL(menu_item_url)
 
-  # TODO(jk0): Enable this in the next iteration.
-  #show_url = None
+  show_url = None
 
   for item in menu_item.xpath('//catalog_title'):
 
@@ -145,7 +144,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
     # TV Shows
     elif TVSHOW_PATTERN.match(item_details['id']):
       oc.add(TVShowObject(
-        key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title'], content = ContainerContent.Seasons),
+        key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title'], content = ContainerContent.Seasons, is_queue = is_queue),
         rating_key = item_details['id'],
         title = item_details['title'],
         thumb = item_details['thumb'][0],
@@ -157,9 +156,6 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
 
     # TV Show Seasons
     elif SEASON_PATTERN.match(item_details['id']):
-      # TODO(jk0): Enable this in the next iteration.
-      #show_url = url
-
       oc.add(SeasonObject(
         key = Callback(MenuItem, url = item_details['episode_url'], title = item_details['title'], content = ContainerContent.Episodes),
         rating_key = item_details['id'],
@@ -170,6 +166,8 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
 
     # TV Episodes
     elif EPISODE_PATTERN.match(item_details['id']):
+      show_url = url
+
       if Prefs['playbackpreference'] != "Ask":
         video_url = PlaybackURL(item_details['url'], Prefs['playbackpreference'])
         oc.add(EpisodeObject(
@@ -209,12 +207,11 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
           duration = item_details['duration']))
 
   # Provide a way to remove a show from the Instant Queue.
-  # TODO(jk0): Enable this in the next iteration.
-  #if is_queue and show_url:
-  #  oc.add(DirectoryObject(
-  #    key = Callback(RemoveFromQueue, url = show_url),
-  #    title = "Remove",
-  #    summary = "Remove this show from your Instant Queue."))
+  if Prefs['playbackpreference'] == "Ask" and is_queue and show_url:
+    oc.add(DirectoryObject(
+      key = Callback(RemoveFromQueue, url = show_url),
+      title = "Remove",
+      summary = "Remove this show from your Instant Queue."))
 
   # If there are further results, add an item to allow them to be browsed.
   start_index = int(start_index)
