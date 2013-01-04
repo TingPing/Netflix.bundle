@@ -415,7 +415,7 @@ def PlaybackSelection(url, title, type, id, thumb, summary, directors, duration,
 
     video_url = PlaybackURL(url, "Resume")
     oc.add(EpisodeObject(
-      key = Callback(Lookup, type = "Episode", url = video_url, id = id),
+      key = Callback(Lookup, type = "Episode", id = id),
       items = [ MediaObject(parts = [PartObject(key = Callback(PlayVideo, type = "Episode", url = video_url, id = id))], protocol = 'webkit') ],
       rating_key = id,
       title = "Resume",
