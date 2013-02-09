@@ -2,7 +2,7 @@ import re
 import US
 
 TITLE = 'Netflix'
-ART = 'art-default.png'
+ART = 'art-default.jpg'
 ICON = 'icon-default.png'
 
 HTTP.Headers['Accept-Encoding'] = 'gzip,sdch'
