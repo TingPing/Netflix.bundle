@@ -211,7 +211,7 @@ class US_Account(object):
                          'y':'13'}
 
       Log("Attempting to accept OAuth request token")
-      page_content = HTTP.Request('https://api-user.netflix.com/oauth/login', original_params, cacheTime = 0).content
+      page_content = HTTP.Request('https://api-user.netflix.com/oauth/login', values=original_params, cacheTime=0).content
       page = HTML.ElementFromString(page_content)
 
       access_token = request.get_access_token(request_token)
