@@ -1,4 +1,5 @@
 import cgi
+import webbrowser
 from us_account import US_Account
 
 ICON_MOVIES     = 'icon-movie.png'
@@ -35,7 +36,8 @@ def MainMenu():
 
     # The user has not yet provided valid credentials. Therefore, we should allow them to be redirected
     # to sign up for a free trial.
-    oc.add(DirectoryObject(key = Callback(FreeTrial), title = 'Sign up for free trial', thumb = R(ICON_MOVIES)))
+    if Client.Platform in ('MacOSX', 'Windows'):
+      oc.add(DirectoryObject(key = Callback(FreeTrial), title = 'Sign up for free trial', thumb = R(ICON_MOVIES)))
 
   oc.add(PrefsObject(title = 'Preferences', thumb = R(ICON_PREFS)))
 
@@ -72,8 +74,7 @@ def Search(query):
 def FreeTrial():
   url = "http://www.netflix.com/"
   webbrowser.open(url, new=1, autoraise=True)
-  return MessageContainer("Free Trial Signup", """A browser has been opened so that you may sign up for a free trial.  If you do not have a mouse 
-      and keyboard handy, visit http://www.netflix.com and sign up for free today!""")
+  return ObjectContainer(header="Free Trial Signup", message="A browser has been opened so that you may sign up for a free trial. If you do not have a mouse and keyboard handy, visit http://www.netflix.com and sign up for free today!")
 
 ###################################################################################################
 
@@ -226,7 +227,7 @@ def MenuItem(url, title, start_index = 0, max_results = 50, content = ContainerC
 
   # Check to see if we have any results
   if len(oc) == 0:
-    return MessageContainer('No Results','No results were found')
+    return ObjectContainer(header='No Results', message='No results were found')
 
   return oc
 
