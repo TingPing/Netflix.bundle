@@ -23,7 +23,7 @@ def Start():
 
 ###################################################################################################
 
-@handler('/video/netflix', TITLE)
+@handler('/video/netflix', TITLE, thumb=ICON, art=ART)
 def Menu():
 
   # Verify that Silverlight is currently installed.
