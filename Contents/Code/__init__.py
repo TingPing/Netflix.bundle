@@ -2,8 +2,6 @@ import re
 import US
 
 TITLE = 'Netflix'
-ART = 'art-default.jpg'
-ICON = 'icon-default.png'
 
 HTTP.Headers['Accept-Encoding'] = 'gzip,sdch'
 
@@ -12,18 +10,12 @@ HTTP.Headers['Accept-Encoding'] = 'gzip,sdch'
 def Start():
 
   ObjectContainer.title1 = TITLE
-  ObjectContainer.art = R(ART)
 
-  DirectoryObject.thumb = R(ICON)
-  DirectoryObject.art = R(ART)
-  VideoClipObject.thumb = R(ICON)
-  VideoClipObject.art = R(ART)
   InputDirectoryObject.thumb = R('search.png')
-  InputDirectoryObject.art = R(ART)
 
 ###################################################################################################
 
-@handler('/video/netflix', TITLE, thumb=ICON, art=ART)
+@handler('/video/netflix', TITLE)
 def Menu():
 
   # Verify that Silverlight is currently installed.

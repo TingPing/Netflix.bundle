@@ -2,10 +2,6 @@ import cgi
 import webbrowser
 from us_account import US_Account
 
-ICON_MOVIES     = 'icon-movie.png'
-ICON_PREFS      = 'icon-prefs.png'
-ICON_SEARCH     = 'icon-search.png'
-
 SEARCH_URL      = 'http://api-public.netflix.com/catalog/titles?v=2.0&term=%s&filters=http://api-public.netflix.com/categories/title_formats/instant'
 
 MOVIE_PATTERN   = Regex('^http://(.)+\.netflix.com/catalog/titles/movies/[0-9]+$')
@@ -30,16 +26,16 @@ def MainMenu():
     
     oc.add(DirectoryObject(key = Callback(UserList), title = 'TV & Movies'))
     oc.add(DirectoryObject(key = Callback(MenuItem, url = 'http://api-public.netflix.com/users/%s/queues/instant' % US_Account.GetUserId(), title = 'Instant Queue', is_queue = True), title = 'Instant Queue'))
-    oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...', thumb = R(ICON_SEARCH)))
+    oc.add(InputDirectoryObject(key = Callback(Search), title = 'Search', prompt = 'Search for a Movie or TV Show...'))
 
   else:
 
     # The user has not yet provided valid credentials. Therefore, we should allow them to be redirected
     # to sign up for a free trial.
     if Client.Platform in ('MacOSX', 'Windows'):
-      oc.add(DirectoryObject(key = Callback(FreeTrial), title = 'Sign up for free trial', thumb = R(ICON_MOVIES)))
+      oc.add(DirectoryObject(key = Callback(FreeTrial), title = 'Sign up for free trial'))
 
-  oc.add(PrefsObject(title = 'Preferences', thumb = R(ICON_PREFS)))
+  oc.add(PrefsObject(title = 'Preferences'))
 
   return oc
 
