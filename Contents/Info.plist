@@ -4,23 +4,14 @@
 <dict>
 	<key>CFBundleIdentifier</key>
 	<string>com.plexapp.plugins.netflix</string>
-	<key>PlexClientCapabilities</key>
-	<dict>
-		<key>protocols</key>
-		<array>
-			<string>webkit</string>
-		</array>
-	</dict>
 	<key>PlexClientPlatformExclusions</key>
 	<string>Roku</string>
 	<key>PlexClientPlatforms</key>
-	<string>*</string>
+	<string>MacOSX</string>
+	<key>PlexServerPlatforms</key>
+	<string>MacOSX-i386</string>
 	<key>PlexFrameworkVersion</key>
 	<string>2</string>
-	<key>PlexMediaContainer</key>
-	<array>
-		<string>Silverlight</string>
-	</array>
 	<key>PlexPluginRegions</key>
 	<array>
 		<string>US</string>
