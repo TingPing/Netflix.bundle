@@ -7,7 +7,7 @@
     windowHeight="720"
     agent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.83 Safari/537.1"
     identifier="com.plexapp.plugins.netflix"
-    version="2.1">
+    version="2.0">
 
     <crop x="0" y="0" width="0" height="0" />
 
@@ -90,7 +90,6 @@
                 <goto state="buffering"/>
             </action>
         </event>
-
         <event>
             <condition>
                 <javascript script="netflix.Silverlight.MoviePlayer.get_hosted_player_control().play_state==101 ? 1 : 0" matches="1"/>
